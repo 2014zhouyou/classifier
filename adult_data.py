@@ -5,6 +5,7 @@ import random
 
 class AdultData:
     data_set = []
+    Name = "AdultDataSet"
 
     def __init__(self, data_file):
         source_file = open(data_file, 'r')

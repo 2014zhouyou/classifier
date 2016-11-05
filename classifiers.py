@@ -32,6 +32,7 @@ class DecisionTreeClassifier:
         :param ev_fac: evaluation factor, three possible input: 'gain', 'gini', 'error', default is 'gain'
         :return:
         """
+        # self.count = 0
         self._tree = self._compute_tree(data_set, labels, label_types)
 
     def fit_one(self, x, label, label_types):
@@ -104,6 +105,7 @@ class DecisionTreeClassifier:
                 :param labels: the attribute name
                 :return: the generated decision tree
                 """
+        # self.count += 1
         data_set = ori_data_set[:]
         labels = ori_labels[:]
         label_types = ori_label_types[:]

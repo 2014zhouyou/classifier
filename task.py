@@ -6,6 +6,10 @@ from adult_data import AdultData
 
 
 def test_holdout(adult_data, factor):
+    base_dir = type(adult_data).__name__ + '_cache/'
+    if not os.path.exists(base_dir):
+        os.mkdir(base_dir)
+
     # data filter
     train_set, test_set = adult_data.divide_holdout()
     print("data filtering....")
@@ -17,18 +21,17 @@ def test_holdout(adult_data, factor):
     label_types = adult_data.get_label_types()
     print(labels)
     print(label_types)
-
     # train process
-    if os.path.exists(factor + '_tree_holdout.pickle'):
-        with open(factor + '_tree_holdout.pickle', 'rb') as f:
+    if os.path.exists(base_dir + factor + '_tree_holdout.pickle'):
+        with open(base_dir + factor + '_tree_holdout.pickle', 'rb') as f:
             clf = pickle.load(f)
     else:
         clf = DecisionTreeClassifier()
         clf.set_evaluation_factor(factor)
         clf.train(train_set, labels, label_types)
-        with open(factor + '_tree_holdout.pickle', 'wb') as f:
-            pickle.dump(clf, f)
 
+        with open(base_dir + factor + '_tree_holdout.pickle', 'wb') as f:
+            pickle.dump(clf, f)
     # validation on the test set
     print(labels)
     correct_count = 0
@@ -49,17 +52,20 @@ def test_10_cross(adult_data, factor):
     :param adult_data: data set to evaluate
     :return: None
     """
+    base_dir = type(adult_data).__name__ + '_cache/'
+    if not os.path.exists(base_dir):
+        os.mkdir(base_dir)
     labels = adult_data.get_labels()
     label_types = adult_data.get_label_types()
     data_set = adult_data.get_data_set()
     data_set_len = len(data_set)
     range_len = int((data_set_len - data_set_len % 10) / 10)
     data_set = data_set[0:10*range_len]
-    clfs = []
+    clfs = list()
     for i in range(0,10):
         print("training sub tree " + str(i))
-        if os.path.exists(factor + '_10_cross.pickle_part'+str(i)):
-            with open(factor + '_10_cross.pickle_part'+str(i), 'rb') as f:
+        if os.path.exists(base_dir + factor + '_10_cross.pickle_part'+str(i)):
+            with open(base_dir + factor + '_10_cross.pickle_part'+str(i), 'rb') as f:
                 clf = pickle.load(f)
                 clfs.append(clf)
         else:
@@ -68,7 +74,7 @@ def test_10_cross(adult_data, factor):
             clf.set_evaluation_factor(factor)
             clf.train(train_set, labels, label_types)
             clfs.append(clf)
-            with open(factor + '_10_cross.pickle_part'+ str(i), 'wb') as f:
+            with open(base_dir + factor + '_10_cross.pickle_part'+ str(i), 'wb') as f:
                 pickle.dump(clf, f)
     accuracy_list = []
     for i in range(0, 10):
@@ -88,14 +94,16 @@ def test_10_cross(adult_data, factor):
 
 
 def test_bootstrap(adult_data, factor, times):
+    base_dir = type(adult_data).__name__ + '_cache/'
+    if not os.path.exists(base_dir):
+        os.mkdir(base_dir)
+
     data_set = adult_data.get_data_set()
     labels = adult_data.get_labels()
     label_types = adult_data.get_label_types()
     ada_clf = AdaBoostClassifier()
     num = len(data_set)
-
     accuracy_list = list()
-
     for i in range(0, times):
         print("times " + str(i))
         weights = [1 / num] * num
@@ -105,24 +113,24 @@ def test_bootstrap(adult_data, factor, times):
         sample_remain_list = list(set([i for i in range(0, num)]).difference(sample_list))
         test_set = [data_set[example] for example in sample_remain_list]
 
-        if os.path.exists(factor + "_tree_bootstrap.pickle_a" + str(i)):
-            with open(factor + "_tree_bootstrap.pickle_a" + str(i), 'rb') as f:
+        if os.path.exists(base_dir + factor + "_tree_bootstrap.pickle_a" + str(i)):
+            with open(base_dir + factor + "_tree_bootstrap.pickle_a" + str(i), 'rb') as f:
                 clf1 = pickle.load(f)
         else:
             clf1 = DecisionTreeClassifier()
             clf1.set_evaluation_factor(factor)
             clf1.train(train_set_a, labels, label_types)
-            with open(factor + "_tree_bootstrap.pickle_a" + str(i), 'wb') as f:
+            with open(base_dir + factor + "_tree_bootstrap.pickle_a" + str(i), 'wb') as f:
                 pickle.dump(clf1, f)
 
-        if os.path.exists(factor + "_tree_bootstrap.pickle_b" + str(i)):
-            with open(factor + "_tree_bootstrap.pickle_b" + str(i), 'rb') as f:
+        if os.path.exists(base_dir + factor + "_tree_bootstrap.pickle_b" + str(i)):
+            with open(base_dir + factor + "_tree_bootstrap.pickle_b" + str(i), 'rb') as f:
                 clf2 = pickle.load(f)
         else:
             clf2 = DecisionTreeClassifier()
             clf2.set_evaluation_factor(factor)
             clf2.train(train_set_b, labels, label_types)
-            with open(factor + "_tree_bootstrap.pickle_b" + str(i), 'wb') as f:
+            with open(base_dir + factor + "_tree_bootstrap.pickle_b" + str(i), 'wb') as f:
                 pickle.dump(clf2, f)
 
         correct_count1 = 0
@@ -163,6 +171,10 @@ def test_after_pruning():
 
 
 def test_adaboost(adult_data):
+    base_dir = type(adult_data).__name__ + '_cache/'
+    if not os.path.exists(base_dir):
+        os.mkdir(base_dir)
+
     train_set, test_set = adult_data.divide_holdout()
     labels = adult_data.get_labels()
     label_types = adult_data.get_label_types()
@@ -173,16 +185,15 @@ def test_adaboost(adult_data):
     print(len(test_set))
     print(labels)
     print(label_types)
-
     print("training...")
-    if os.path.exists('adaboost.pickle'):
-        with open('adaboost.pickle', 'rb') as f:
+    if os.path.exists(base_dir + 'adaboost.pickle'):
+        with open(base_dir + 'adaboost.pickle', 'rb') as f:
             clf = pickle.load(f)
     else:
         clf = AdaBoostClassifier()
         clf.set_iterations(10)
         clf.train(train_set, labels, label_types)
-        with open('adaboost.pickle', 'wb') as f:
+        with open(base_dir + 'adaboost.pickle', 'wb') as f:
             pickle.dump(clf, f)
 
     correct_count = 0
@@ -217,21 +228,22 @@ def test_with_missing_value():
 
 if __name__ == '__main__':
     adult_data = AdultData('adult.csv')
+    # print(type(adult_data).__name__)
     test_holdout(adult_data, 'GAIN')
-    # test_10_cross(adult_data, 'GAIN')
-    # test_bootstrap(adult_data, 'GAIN', 10)
-    #
-    # test_holdout(adult_data, 'GINI')
-    # test_10_cross(adult_data, 'GINI')
-    # test_bootstrap(adult_data, 'GINI', 10)
+    test_10_cross(adult_data, 'GAIN')
+    test_bootstrap(adult_data, 'GAIN', 10)
 
-    # test_holdout(adult_data, 'MISCLASSFICATION')
-    # test_10_cross(adult_data, 'MISCLASSFICATION')
-    # test_bootstrap(adult_data, 'MISCLASSFICATION', 10)
+    test_holdout(adult_data, 'GINI')
+    test_10_cross(adult_data, 'GINI')
+    test_bootstrap(adult_data, 'GINI', 10)
+
+    test_holdout(adult_data, 'MISCLASSFICATION')
+    test_10_cross(adult_data, 'MISCLASSFICATION')
+    test_bootstrap(adult_data, 'MISCLASSFICATION', 10)
 
     # test_pre_pruning()
     # test_after_pruning()
 
     # test_with_missing_value()
 
-    # test_adaboost(adult_data)
+    test_adaboost(adult_data)
