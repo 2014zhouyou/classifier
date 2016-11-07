@@ -1,0 +1,4 @@
+A implementation for decision tree
+classifiers.py : implement a decision ree classifier and adaboost classifier
+data.py: the data set
+task.py: some test for classifier
