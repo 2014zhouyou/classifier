@@ -1,7 +1,7 @@
 import math
 import random
 import time
-from adult_data import AdultData
+from data import AdultData
 
 
 class DecisionTreeClassifier:
